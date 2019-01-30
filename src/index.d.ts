@@ -1351,7 +1351,7 @@ declare module 'react-native-firebase' {
         /**
          * Cancels a notification by ID
          */
-        cancelNotification(notificationId: string): void;
+        cancelNotification(notificationId: string, notificationParams: NotificationParams): void;
 
         displayNotification(notification: Notification): Promise<void>;
 
@@ -1408,7 +1408,7 @@ declare module 'react-native-firebase' {
         setData(data: any): Notification;
 
         setNotificationId(notificationId: string): Notification;
-
+        
         setSound(sound: string): Notification;
 
         setSubtitle(subtitle: string): Notification;
@@ -1448,6 +1448,7 @@ declare module 'react-native-firebase' {
         priority?: Android.Priority;
         progress?: Android.Progress;
         remoteInputHistory?: string[];
+        requestCode?: string;
         shortcutId?: string;
         showWhen?: boolean;
         smallIcon?: any;
@@ -1525,6 +1526,8 @@ declare module 'react-native-firebase' {
 
         //setPublicVersion(publicVersion: Notification): Notification
         setRemoteInputHistory(remoteInputHistory: string[]): Notification;
+        
+        setRequestCode(requestCode: string): Notification;
 
         setShortcutId(shortcutId: string): Notification;
 

@@ -72,6 +72,9 @@ export default class AndroidNotification {
   _progress: Progress | void;
 
   // _publicVersion: Notification;
+
+  _requestCode: string | void;
+
   _remoteInputHistory: string[] | void;
 
   _shortcutId: string | void;
@@ -138,6 +141,7 @@ export default class AndroidNotification {
       this._priority = data.priority;
       this._progress = data.progress;
       // _publicVersion: Notification;
+      this._requestCode = data.requestCode;
       this._remoteInputHistory = data.remoteInputHistory;
       this._shortcutId = data.shortcutId;
       this._showWhen = data.showWhen;
@@ -254,6 +258,10 @@ export default class AndroidNotification {
 
   get progress(): ?Progress {
     return this._progress;
+  }
+
+  get requestCode(): ?string {
+    return this._requestCode;
   }
 
   get remoteInputHistory(): ?(string[]) {
@@ -615,6 +623,16 @@ export default class AndroidNotification {
 
   /**
    *
+   * @param requestCode
+   * @returns {Notification}
+   */
+  setRequestCode(requestCode: string): Notification {
+    this._requestCode = requestCode;
+    return this._notification;
+  }
+
+  /**
+   *
    * @param shortcutId
    * @returns {Notification}
    */
@@ -765,6 +783,7 @@ export default class AndroidNotification {
       priority: this._priority,
       progress: this._progress,
       // publicVersion: this._publicVersion,
+      requestCode: this._requestCode,
       remoteInputHistory: this._remoteInputHistory,
       shortcutId: this._shortcutId,
       showWhen: this._showWhen,

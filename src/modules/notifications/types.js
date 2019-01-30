@@ -230,3 +230,12 @@ export type NativeNotificationOpen = {|
   notification: NativeNotification,
   results?: { [string]: string },
 |};
+
+export type NotificationParamsAndroid = {|
+  requestCode?: string,
+|};
+
+export type NotificationParams = {|
+  android: NotificationParamsAndroid,
+  // ios: NotificationParamsIOS,
+|};

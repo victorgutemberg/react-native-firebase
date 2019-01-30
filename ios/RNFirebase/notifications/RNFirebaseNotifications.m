@@ -254,13 +254,14 @@ RCT_EXPORT_METHOD(cancelAllNotifications:(RCTPromiseResolveBlock)resolve
     resolve(nil);
 }
 
-RCT_EXPORT_METHOD(cancelNotification:(NSString*) notificationId
+RCT_EXPORT_METHOD(cancelNotification:(NSDictionary*) notificationInfo
                             resolver:(RCTPromiseResolveBlock)resolve
                             rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *notificationId = notificationInfo[@"notificationId"]);
     if ([self isIOS89]) {
         for (UILocalNotification *notification in RCTSharedApplication().scheduledLocalNotifications) {
-            NSDictionary *notificationInfo = notification.userInfo;
-            if ([notificationId isEqualToString:notificationInfo[@"notificationId"]]) {
+            NSDictionary *notificationUserInfo = notification.userInfo;
+            if ([notificationId isEqualToString:notificationUserInfo[@"notificationId"]]) {
                 [RCTSharedApplication() cancelLocalNotification:notification];
             }
         }

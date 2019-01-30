@@ -64,6 +64,19 @@ class RNFirebaseNotificationManager {
       .getIdentifier(image, type, context.getPackageName());
   }
 
+  static String getNotificationKey(Bundle notificationInfo) {
+    String notificationId = notificationInfo.getString("notificationId");
+    String notificationKey = notificationId;
+    if(notificationInfo.containsKey("android")) {
+      Bundle android = notificationInfo.getBundle("android");
+      if(android.containsKey("requestCode")) {
+        String requestCode = android.getString("requestCode");
+        notificationKey += "." + requestCode;
+      }
+    }
+    return notificationKey;
+  }
+
   static Uri getSound(Context context, String sound) {
     if (sound == null) {
       return null;
@@ -84,8 +97,8 @@ class RNFirebaseNotificationManager {
     try {
       Map<String, ?> notifications = preferences.getAll();
 
-      for (String notificationId : notifications.keySet()) {
-        cancelAlarm(notificationId);
+      for (String notificationKey : notifications.keySet()) {
+        cancelAlarm(notificationKey);
       }
 
       preferences
@@ -106,12 +119,15 @@ class RNFirebaseNotificationManager {
     }
   }
 
-  void cancelNotification(String notificationId, Promise promise) {
+  void cancelNotification(ReadableMap notificationInfo, Promise promise) {
+    Bundle notificationBundle = Arguments.toBundle(notificationInfo);
+    String notificationKey = getNotificationKey(notificationBundle);
+
     try {
-      cancelAlarm(notificationId);
+      cancelAlarm(notificationKey);
       preferences
         .edit()
-        .remove(notificationId)
+        .remove(notificationKey)
         .apply();
       promise.resolve(null);
     } catch (SecurityException e) {
@@ -183,10 +199,10 @@ class RNFirebaseNotificationManager {
       || !notification
       .getBundle("schedule")
       .getBoolean("repeated")) {
-      String notificationId = notification.getString("notificationId");
+      String notificationKey = getNotificationKey(notification);
       preferences
         .edit()
-        .remove(notificationId)
+        .remove(notificationKey)
         .apply();
     }
 
@@ -209,9 +225,9 @@ class RNFirebaseNotificationManager {
 
     Map<String, ?> notifications = preferences.getAll();
 
-    for (String notificationId : notifications.keySet()) {
+    for (String notificationKey : notifications.keySet()) {
       try {
-        JSONObject json = new JSONObject((String) notifications.get(notificationId));
+        JSONObject json = new JSONObject((String) notifications.get(notificationKey));
         Bundle bundle = BundleJSONConverter.convertToBundle(json);
         array.add(bundle);
       } catch (JSONException e) {
@@ -257,11 +273,11 @@ class RNFirebaseNotificationManager {
     scheduleNotification(notificationBundle, promise);
   }
 
-  private void cancelAlarm(String notificationId) {
+  private void cancelAlarm(String notificationKey) {
     Intent notificationIntent = new Intent(context, RNFirebaseNotificationReceiver.class);
     PendingIntent pendingIntent = PendingIntent.getBroadcast(
       context,
-      notificationId.hashCode(),
+      notificationKey.hashCode(),
       notificationIntent,
       PendingIntent.FLAG_UPDATE_CURRENT
     );
@@ -356,7 +372,7 @@ class RNFirebaseNotificationManager {
       return;
     }
 
-    String notificationId = notification.getString("notificationId");
+    String notificationKey = getNotificationKey(notification);
     Bundle schedule = notification.getBundle("schedule");
 
     // fireDate may be stored in the Bundle as 2 different types that we need to handle:
@@ -387,7 +403,7 @@ class RNFirebaseNotificationManager {
       JSONObject json = BundleJSONConverter.convertToJSON(notification);
       preferences
         .edit()
-        .putString(notificationId, json.toString())
+        .putString(notificationKey, json.toString())
         .apply();
     } catch (JSONException e) {
       if (promise == null) {
@@ -406,7 +422,7 @@ class RNFirebaseNotificationManager {
     notificationIntent.putExtras(notification);
     PendingIntent pendingIntent = PendingIntent.getBroadcast(
       context,
-      notificationId.hashCode(),
+      notificationKey.hashCode(),
       notificationIntent,
       PendingIntent.FLAG_UPDATE_CURRENT
     );

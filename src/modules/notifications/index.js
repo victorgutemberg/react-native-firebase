@@ -31,6 +31,7 @@ import type { NotificationOpen } from './Notification';
 import type {
   NativeNotification,
   NativeNotificationOpen,
+  NotificationParams,
   Schedule,
 } from './types';
 
@@ -149,8 +150,9 @@ export default class Notifications extends ModuleBase {
   /**
    * Cancel a notification by id.
    * @param notificationId
+   * @param notificationParams
    */
-  cancelNotification(notificationId: string): Promise<void> {
+  cancelNotification(notificationId, notificationParams: NotificationParams) {
     if (!notificationId) {
       return Promise.reject(
         new Error(
@@ -158,7 +160,11 @@ export default class Notifications extends ModuleBase {
         )
       );
     }
-    return getNativeModule(this).cancelNotification(notificationId);
+    const notificationInfo = {
+      ...notificationParams,
+      notificationId,
+    };
+    return getNativeModule(this).cancelNotification(notificationInfo);
   }
 
   /**
@@ -302,6 +308,7 @@ export default class Notifications extends ModuleBase {
   /**
    * Schedule a notification
    * @param notification
+   * @param schedule
    * @returns {*}
    */
   scheduleNotification(

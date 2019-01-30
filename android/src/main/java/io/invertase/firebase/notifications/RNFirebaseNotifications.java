@@ -76,8 +76,8 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void cancelNotification(String notificationId, Promise promise) {
-    notificationManager.cancelNotification(notificationId, promise);
+  public void cancelNotification(ReadableMap notificationInfo, Promise promise) {
+    notificationManager.cancelNotification(notificationInfo, promise);
   }
 
   @ReactMethod
