@@ -121,21 +121,8 @@ class RNFirebaseNotificationManager {
 
   void cancelNotification(ReadableMap notificationInfo, Promise promise) {
     Bundle notificationBundle = Arguments.toBundle(notificationInfo);
-    String notificationKey = getNotificationKey(notificationBundle);
 
-    try {
-      cancelAlarm(notificationKey);
-      preferences
-        .edit()
-        .remove(notificationKey)
-        .apply();
-      promise.resolve(null);
-    } catch (SecurityException e) {
-      // TODO: Identify what these situations are
-      // In some devices/situations cancelAllLocalNotifications can throw a SecurityException.
-      Log.e(TAG, e.getMessage());
-      promise.reject("notification/cancel_notification_error", "Could not cancel notifications", e);
-    }
+    cancelNotification(notificationBundle, promise);
   }
 
   void createChannel(ReadableMap channelMap) {
@@ -282,6 +269,24 @@ class RNFirebaseNotificationManager {
       PendingIntent.FLAG_UPDATE_CURRENT
     );
     alarmManager.cancel(pendingIntent);
+  }
+
+  private void cancelNotification(Bundle notificationInfo, Promise promise) {
+    String notificationKey = getNotificationKey(notificationInfo);
+
+    try {
+      cancelAlarm(notificationKey);
+      preferences
+              .edit()
+              .remove(notificationKey)
+              .apply();
+      promise.resolve(null);
+    } catch (SecurityException e) {
+      // TODO: Identify what these situations are
+      // In some devices/situations cancelAllLocalNotifications can throw a SecurityException.
+      Log.e(TAG, e.getMessage());
+      promise.reject("notification/cancel_notification_error", "Could not cancel notifications", e);
+    }
   }
 
   private void displayNotification(Bundle notification, Promise promise) {
